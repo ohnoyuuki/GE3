@@ -1046,6 +1046,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
+
 	//バイナリを元に生成
 	ID3D12RootSignature* rootSignature = nullptr;
 	hr = device->CreateRootSignature(0,
