@@ -13,6 +13,12 @@
 #include"externals/DirectXTex/DirectXTex.h"
 #include<fstream>
 #include<sstream>
+# define DERECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
@@ -821,6 +827,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr              //オプション
 	);
 
+	
+
+
 	//ウィンドウを表示する
 	ShowWindow(hwnd, SW_SHOW);
 
@@ -1138,6 +1147,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	assert(SUCCEEDED(hr));
 
 
+	//DirectInputの初期化
+	IDirectInput8* directInput = nullptr;
+	hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, 
+		(void**)&directInput, nullptr);
+	assert(SUCCEEDED(hr));
+
+	//キーボードデバイスの生成
+	IDirectInputDevice8* keyboard = nullptr;
+	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+	assert(SUCCEEDED(hr));
+
+	//入力データ形式のセット
+	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);//標準形式
+	assert(SUCCEEDED(hr));
+
+	//排他制御レベルのセット（どんな時に入力を受けるか）
+	hr = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	assert(SUCCEEDED(hr));
+
+
+
+
 
 	//三角形２個
 	/*
@@ -1351,6 +1382,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	indexDataSprite[0] = 0; indexDataSprite[1] = 1; indexDataSprite[2] = 2;
 	indexDataSprite[3] = 1; indexDataSprite[4] = 3; indexDataSprite[5] = 2;
 
+	BYTE key[256]{};
+	BYTE prekey[256]{};
 
 	//------------------------------------------------------------------------------------------------------------------------------
 
@@ -1365,7 +1398,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			DispatchMessage(&msg);
 		} else
 		{
+			
+
+			//キーボード情報の所得開始
+			keyboard->Acquire();
+			//全キーの入力状態を取得する
+			memcpy(prekey, key, 256);
+			//最新の入力を保存
+			keyboard->GetDeviceState(sizeof(key), key);
+
+
+			//フレームが始まる旨を告げる
+			ImGui_ImplDX12_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+
 			//ゲームの処理
+			if(key[DIK_SPACE]&&!prekey[DIK_SPACE]){
+ 				OutputDebugStringA("Press Space\n");
+			}
+
 
 			//Sprite用のWorldViewProjectionMatrixを作る
 			Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
@@ -1374,10 +1426,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
 			*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
-			//フレームが始まる旨を告げる
-			ImGui_ImplDX12_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
+			
 
 
 
@@ -1531,6 +1580,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			assert(SUCCEEDED(hr));
 			hr = commandList->Reset(commandAllocator, nullptr);
 			assert(SUCCEEDED(hr));
+
+			//エスケープを押したら終了
+			if (key[DIK_ESCAPE]) {
+				OutputDebugStringA("Game End\n");
+				break;
+				//assert(false && "SPACEが押されたのが確認できました");
+
+			}
+
 		}
 
 
