@@ -13,6 +13,7 @@
 #include"externals/DirectXTex/DirectXTex.h"
 #include<fstream>
 #include<sstream>
+#include"Input.h"
 # define DERECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -1167,7 +1168,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	assert(SUCCEEDED(hr));
 
 
+	// ポインタ
+	Input* input = nullptr;
 
+	// 入力の初期化
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
+
+	// 入力解放
+	delete input;
 
 
 	//三角形２個
