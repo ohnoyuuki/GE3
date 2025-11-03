@@ -12,8 +12,8 @@ void Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 	/// Dirrect Input 初期化
 	HRESULT result;
 
-	// DirectInputのインスタンス生成
-	ComPtr<IDirectInput8> directInput = nullptr;
+	// 前回のキー状態を保存
+	memcpy(keyPre, key, sizeof(key));
 
 	result = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8,(void**)&directInput, nullptr);
 	assert(SUCCEEDED(result));
@@ -35,6 +35,22 @@ void Input::Update()
 	// キーボード取得開始
 	keyboard->Acquire();
 	// 全キーの入力情報を取得する
-	BYTE key[256] = {};
+	
 	keyboard->GetDeviceState(sizeof(key), key);
+}
+
+bool Input::PushKey(BYTE keyNumber)
+{
+	//指定キーを押していればtrueを返す
+	if(key[keyNumber]){
+		return true;
+	}
+	//そうでなければFalseを返す
+	return false;
+}
+
+bool Input::TriggerKey(BYTE keyNumber)
+{
+	// 今フレーム押されていて、前フレームは押されていなかった場合 true
+	return (key[keyNumber] != 0 && keyPre[keyNumber] == 0);
 }

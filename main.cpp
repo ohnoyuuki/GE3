@@ -1396,6 +1396,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	BYTE key[256]{};
 	BYTE prekey[256]{};
 
+	LPDIRECTINPUT8 directInput = nullptr;
+	LPDIRECTINPUTDEVICE8 keyboard = nullptr;
 	//------------------------------------------------------------------------------------------------------------------------------
 
 	MSG msg{};
