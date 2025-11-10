@@ -827,10 +827,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		wc.hInstance,        //インスタンスハンドル
 		nullptr              //オプション
 	);
-
-	
-
-
 	//ウィンドウを表示する
 	ShowWindow(hwnd, SW_SHOW);
 
@@ -1413,17 +1409,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		} else
 #pragma endregion WindowAPIを利用したメッセージの受信と処理ここまで
 		{
-			
-			
-
-			////キーボード情報の所得開始
-			//keyboard->Acquire();
-			////全キーの入力状態を取得する
-			//memcpy(prekey, key, 256);
-			////最新の入力を保存
-			//keyboard->GetDeviceState(sizeof(key), key);
-
-
 			//フレームが始まる旨を告げる
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
