@@ -14,6 +14,7 @@
 #include<fstream>
 #include<sstream>
 #include"Input.h"
+#include"WinApp.h"
 # define DERECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -808,7 +809,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ウィンドウサイズを表す構造体にクライアント領域を入れる
 	RECT wrc = { 0,0,kClientWidth ,kClientHeight };
 
-
 	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
@@ -1173,7 +1173,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	input->Update();
 
-	
+	WinApp* winApp = nullptr;
+	//
 
 
 	//三角形２個
@@ -1415,8 +1416,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::NewFrame();
 
 			//ゲームの処理
-			if(key[DIK_SPACE]&&!prekey[DIK_SPACE]){
- 				OutputDebugStringA("Press Space\n");
+			if (key[DIK_SPACE] && !prekey[DIK_SPACE]) {
+				OutputDebugStringA("Press Space\n");
 			}
 
 
@@ -1427,7 +1428,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
 			*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
-			
+
 
 
 
@@ -1690,7 +1691,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	materialResource->Release();
 	CloseWindow(hwnd);
 
-	
+
 
 	CoUninitialize();
 
