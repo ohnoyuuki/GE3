@@ -828,7 +828,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr              //オプション
 	);
 
-	
+
 
 
 	//ウィンドウを表示する
@@ -1177,8 +1177,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	input->Update();
 
-	// 入力解放
-	delete input;
+
 
 
 	//三角形２個
@@ -1400,6 +1399,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	LPDIRECTINPUTDEVICE8 keyboard = nullptr;
 	//------------------------------------------------------------------------------------------------------------------------------
 
+	//メインループ
+#pragma region WindowAPIを利用したメッセージの受信と処理
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
 	while (msg.message != WM_QUIT)
@@ -1410,15 +1411,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		} else
+#pragma endregion WindowAPIを利用したメッセージの受信と処理ここまで
 		{
-			
 
-			//キーボード情報の所得開始
-			keyboard->Acquire();
-			//全キーの入力状態を取得する
-			memcpy(prekey, key, 256);
-			//最新の入力を保存
-			keyboard->GetDeviceState(sizeof(key), key);
+
+
+			////キーボード情報の所得開始
+			//keyboard->Acquire();
+			////全キーの入力状態を取得する
+			//memcpy(prekey, key, 256);
+			////最新の入力を保存
+			//keyboard->GetDeviceState(sizeof(key), key);
 
 
 			//フレームが始まる旨を告げる
@@ -1427,8 +1430,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::NewFrame();
 
 			//ゲームの処理
-			if(key[DIK_SPACE]&&!prekey[DIK_SPACE]){
- 				OutputDebugStringA("Press Space\n");
+			if (key[DIK_SPACE] && !prekey[DIK_SPACE]) {
+				OutputDebugStringA("Press Space\n");
 			}
 
 
@@ -1439,7 +1442,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
 			*transformationMatrixDataSprite = worldViewProjectionMatrixSprite;
 
-			
+
 
 
 
@@ -1683,14 +1686,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	device->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
+	// 入力解放
+	delete input;
 #ifdef _DEBUG
 	debugController->Release();
 #endif
-
-	wvpResource->Release();
-	materialResource->Release();
-	CloseWindow(hwnd);
-
 	// リソースリークチェック
 	IDXGIDebug1* debug;
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
@@ -1700,6 +1700,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
 		debug->Release();
 	}
+
+	wvpResource->Release();
+	materialResource->Release();
+	CloseWindow(hwnd);
+
+
 
 	CoUninitialize();
 
