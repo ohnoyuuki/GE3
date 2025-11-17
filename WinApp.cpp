@@ -52,7 +52,7 @@ void WinApp::Initialize()
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	//ウィンドウの生成
-	HWND hwnd = CreateWindow
+	hwnd = CreateWindow
 	(
 		wc.lpszClassName,    //利用するクラス名
 		L"CG2",              //タイトルバーの文字

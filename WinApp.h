@@ -1,5 +1,7 @@
 #pragma once
 #include<Windows.h>
+#include<stdint.h>
+
 class WinApp
 {
 public:
@@ -24,13 +26,15 @@ public:
 	//終了
 	void Finalize();
 
+	//メッセージの処理
+	bool ProcessMessage();
+
 private:
 	HWND hwnd = nullptr;
 	//ウィンドウクラスの設定
 	WNDCLASS wc{};
 
-	//メッセージの処理
-	bool ProcessMessage();
+	
 
 };
 
