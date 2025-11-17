@@ -18,14 +18,19 @@ public:
 	// 初期化処理
 	void Initialize();
 
-
 	// 更新処理
 	void Update();
+
+	//終了
+	void Finalize();
 
 private:
 	HWND hwnd = nullptr;
 	//ウィンドウクラスの設定
 	WNDCLASS wc{};
+
+	//メッセージの処理
+	bool ProcessMessage();
 
 };
 

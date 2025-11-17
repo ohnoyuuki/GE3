@@ -797,7 +797,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Input* input = nullptr;
 	// 入力の初期化
 	input = new Input();
-	input->Initialize(winApp->GetHInstance(),winApp->GetHwnd());
+	input->Initialize(winApp);
 
 	input->Update();
 
@@ -1169,7 +1169,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	////DirectInputの初期化
 	//IDirectInput8* directInput = nullptr;
-	//hr = DirectInput8Create(wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, 
+	hr = DirectInput8Create(winApp->GetHInstance(),DIRECTINPUT_VERSION, IID_IDirectInput8, 
 	//	(void**)&directInput, nullptr);
 	//assert(SUCCEEDED(hr));
 
@@ -1685,10 +1685,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	device->Release();
 	useAdapter->Release();
 	dxgiFactory->Release();
-	// 入力解放
-	delete input;
-	//WindowsAPI解放
-	delete winApp;
+	
 
 #ifdef _DEBUG
 	debugController->Release();
@@ -1705,11 +1702,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	wvpResource->Release();
 	materialResource->Release();
-	CloseWindow(hwnd);
 
+	// 入力解放
+	delete input;
+	
 
+	//WindowsAPIの終了処理
+	winApp->Finalize();
 
-	CoUninitialize();
+	//WindowsAPI解放
+	delete winApp;
+	winApp = nullptr;
+
+	/*CloseWindow(hwnd);*/
+	/*CoUninitialize();*/
 
 	return 0;
 }
