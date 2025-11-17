@@ -773,6 +773,8 @@ ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
 		IID_PPV_ARGS(&vertexResource));
 	assert(SUCCEEDED(hr));
 	return vertexResource;
+
+	
 }
 
 
@@ -785,6 +787,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	
 	//出力ウィンドウへの文字入力
 	OutputDebugStringA("Hell,DirectX!\n");
+
+	WinApp* winApp = nullptr;
+	//WindowAPIの初期化
+	winApp = new WinApp();
+	winApp->Initialize();
+
+	// ポインタ
+	Input* input = nullptr;
+	// 入力の初期化
+	input = new Input();
+	input->Initialize(winApp->GetHInstance(),winApp->GetHwnd());
+
+	input->Update();
+
+	
 
 
 	//////COMの初期化
@@ -845,7 +862,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// DXGIファクトリーの生成
 	IDXGIFactory7* dxgiFactory = nullptr;
-	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(hr));
 
 	//使用するアダプタ用の変数。最初にnullptrを入れておく
@@ -919,8 +936,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//スワップチェーンを生成する
 	IDXGISwapChain4* swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	swapChainDesc.Width = kClientWidth;
-	swapChainDesc.Height = kClientHeight;
+	swapChainDesc.Width = WinApp::kClientWidth;
+	swapChainDesc.Height = WinApp::kClientHeight;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -929,7 +946,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//コマンドキュー、ウィンドウハンドル、設定を渡して生成する
 	hr = dxgiFactory->CreateSwapChainForHwnd
 	(
-		commandQueue, hwnd, &swapChainDesc, nullptr, nullptr,
+		commandQueue,
+		winApp->GetHwnd(),
+		& swapChainDesc,
+		nullptr,
+		nullptr,
 		reinterpret_cast<IDXGISwapChain1**>(&swapChain)
 	);
 	assert(SUCCEEDED(hr));
@@ -1166,19 +1187,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//assert(SUCCEEDED(hr));
 
 
-	// ポインタ
-	Input* input = nullptr;
-
-	// 入力の初期化
-	input = new Input();
-	input->Initialize(wc.hInstance, hwnd);
-
-	input->Update();
-
-	WinApp* winApp = nullptr;
-	//WindowAPIの初期化
-	winApp = new WinApp();
-	winApp->Initialize();
+	
 
 
 	//三角形２個
