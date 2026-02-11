@@ -6,8 +6,14 @@
 #include <Windows.h>
 #include <array>
 #include <dxcapi.h>
+#include <string>
+#include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
+
 
 class WinApp;
+
+
 
 class DirectXCommon
 {
@@ -50,6 +56,23 @@ public:
 	void PreDraw();
 	//描画後処理
 	void PostDraw();
+
+	ID3D12Device* GetDevice()const { return device.Get(); }
+
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+
+	//シェーダ－コンパイル----------------------------------
+	Microsoft::WRL::ComPtr<IDxcBlob>CompileShader(
+		const std::wstring& filePath,
+		const wchar_t* profile);
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
+
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 private:
 	//DirectX12デバイス
@@ -119,5 +142,6 @@ private:
 
 	// TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
+
 };
 
