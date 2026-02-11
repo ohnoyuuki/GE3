@@ -46,6 +46,11 @@ public:
 
 	void InitializeImGui();
 
+	//描画前処理
+	void PreDraw();
+	//描画後処理
+	void PostDraw();
+
 private:
 	//DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
@@ -91,6 +96,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 	// フェンス値
 	uint64_t fenceValue = 0;
+
 	HANDLE fenceEvent;
 
 	// ビューポート
@@ -107,5 +113,11 @@ private:
 
 	//RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+
+	// RTVを2つ作るのでディスクリプタを2つ用意
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+	// TransitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
 };
 

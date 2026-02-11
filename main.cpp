@@ -1270,135 +1270,62 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			ImGui::Render();
 
 			//更新処理をかく
-			//これからもよろしくお願いします。
-//			UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-//
-//			// TransitionBarrierの設定
-//			D3D12_RESOURCE_BARRIER barrier{};
-//			// 今回のバリアはTransition
-//			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-//			// Noneにしておく
-//			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-//			// バリアを張る対象のリソース。現在のバックバッファに対して行う
-//			barrier.Transition.pResource = swapChainResources[backBufferIndex];
-//			// 遷移前（現在）のResourceState
-//			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-//			// 遷移後のResourceState
-//			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-//			// TransitionBarrierを張る
-//			commandList->ResourceBarrier(1, &barrier);
-//
-//			//描画先のRTVを設定する
-//			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-//			//指定した色で画面全体をクリアする
-//			float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-//			commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-//
-//			//描画先のRTVとDSVを設定する
-//			D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-//			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
-//			//指定した深度で画面全体をクリアする
-//			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-//
-//			//描画用のDescriptorHeapの設定
-//			ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
-//			commandList->SetDescriptorHeaps(1, descriptorHeaps);
-//
-//
-//			//コマンドを積む
-//			commandList->RSSetViewports(1, &viewport);//viewportを設定
-//			commandList->RSSetScissorRects(1, &scissorRect);//Scirssorを設定
-//			//RootSignatureを設定。PSOに設定しているけど別途設定が必要
-//			commandList->SetGraphicsRootSignature(rootSignature);
-//			commandList->SetPipelineState(graphicsPipelineState);//PSOを設定
-//			commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
-//			//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばいいい
-//			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//
-//			//マテリアルCBufferの場所を設定
-//			commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-//			// wvp用のCBufferの場所を設定
-//			commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-//
-//			//SRVのDescriptorTableの先頭を設定。２はrootParameter[2]である。
-//			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-//
-//			//インデックスを指定
-//			commandList->IASetIndexBuffer(&indexBufferViewSprite);//IBNを設定
-//
-//			//描画!(DrawCall/ドローコル）。３頂点で一つのインスタンス。インスタンスについては今後
-//			//commandList->DrawInstanced(6, 1, 0, 0);
-//
-//			//モデル描画
-//			commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-//
-//			//--------------------------------------
-//
-//			////Spriteの描画。変更が必要なものだけ変更
-//			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-//			////TransformationMatrixCBufferの場所を設定
-//			commandList->SetGraphicsRootConstantBufferView(1, transformtionMatirxResourceSprite->GetGPUVirtualAddress());
-//			////描画！（DrawInstanced(DrawCall/ドローコル）
-//			commandList->DrawInstanced(6, 1, 0, 0);
-//			////描画!(DrawCall/ドローコル）６個のインデックスを使用し１つのインスタンスを描画。その他は当面０で良い
-//			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-//
-//
-//
-//			//実際のcommandListのImGuiの描画コマンドを積む
-//			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
-//
-//
-//			// 今回はRenderTargetからPresentにする
-//			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-//			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-//			// TransitionBarrierを張る
-//			commandList->ResourceBarrier(1, &barrier);
-//
-//			//コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
-//			hr = commandList->Close();
-//			assert(SUCCEEDED(hr));
-//
-//			//GPUにコマンドリストの実行を行わせる
-//			ID3D12CommandList* commandLists[] = { commandList };
-//			commandQueue->ExecuteCommandLists(1, commandLists);
-//			//GPUとOSに画面の交換を行うよう追加する
-//			swapChain->Present(1, 0);
-//
-//			// Fenceの値を更新
-//			fenceValue++;
-//
-//			// GPUがここまでたどり着いたときに、
-//			// Fenceの値を指定した値に代入するようにSignalを送る
-//			commandQueue->Signal(fence, fenceValue);
-//
-//			// Fenceの値が指定したSignal値にたどり着いているか確認する
-//			// GetCompletdValueの初期化はFence作成時に渡した初期値
-//			if (fence->GetCompletedValue() < fenceValue) {
-//				// 指定したSignalにたどり着いいていないので、
-//				// たどり着くまで待つようにイベントを設定する
-//				fence->SetEventOnCompletion(fenceValue, fenceEvent);
-//				// イベントを待つ
-//				WaitForSingleObject(fenceEvent, INFINITE);
-//			}
-//
-//			//次のフレーム用のコマンドリストを準備
-//			hr = commandAllocator->Reset();
-//			assert(SUCCEEDED(hr));
-//			hr = commandList->Reset(commandAllocator, nullptr);
-//			assert(SUCCEEDED(hr));
-//
-//			//エスケープを押したら終了
-//			if (key[DIK_ESCAPE]) {
-//				OutputDebugStringA("Game End\n");
-//				break;
-//				//assert(false && "SPACEが押されたのが確認できました");
-//
-//			}
-//
-//		
-//
-//
+			// 描画前処理
+			dxCommon->PreDraw();
+			////RootSignatureを設定。PSOに設定しているけど別途設定が必要
+			//commandList->SetGraphicsRootSignature(rootSignature);
+			//commandList->SetPipelineState(graphicsPipelineState);//PSOを設定
+			//commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
+			////形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばいいい
+			//commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			////マテリアルCBufferの場所を設定
+			//commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+			//// wvp用のCBufferの場所を設定
+			//commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+
+			////SRVのDescriptorTableの先頭を設定。２はrootParameter[2]である。
+			//commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+
+			////インデックスを指定
+			//commandList->IASetIndexBuffer(&indexBufferViewSprite);//IBNを設定
+
+			////描画!(DrawCall/ドローコル）。３頂点で一つのインスタンス。インスタンスについては今後
+			////commandList->DrawInstanced(6, 1, 0, 0);
+
+			////モデル描画
+			//commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+
+			////--------------------------------------
+
+			//////Spriteの描画。変更が必要なものだけ変更
+			//commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+			//////TransformationMatrixCBufferの場所を設定
+			//commandList->SetGraphicsRootConstantBufferView(1, transformtionMatirxResourceSprite->GetGPUVirtualAddress());
+			//////描画！（DrawInstanced(DrawCall/ドローコル）
+			//commandList->DrawInstanced(6, 1, 0, 0);
+			//////描画!(DrawCall/ドローコル）６個のインデックスを使用し１つのインスタンスを描画。その他は当面０で良い
+			//commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+
+
+			//実際のcommandListのImGuiの描画コマンドを積む
+			/*ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);*/
+
+			// 描画後処理
+			dxCommon->PostDraw();
+			
+			//エスケープを押したら終了
+			if (key[DIK_ESCAPE]) {
+				OutputDebugStringA("Game End\n");
+				break;
+				//assert(false && "SPACEが押されたのが確認できました");
+
+			}
+
+		
+
+
 //#ifdef _DEBUG
 //		ID3D12InfoQueue* infoQueue = nullptr;
 //		if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
