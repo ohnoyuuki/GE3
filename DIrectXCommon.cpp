@@ -363,11 +363,11 @@ void DirectXCommon::InitializeImGui()
 void DirectXCommon::PreDraw()
 {
 
-
+	// これから書き込むバックバッファのインデックスを取得
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
-	// TransitionBarrierの設定
-	D3D12_RESOURCE_BARRIER barrier{};
+	//----TransitionBarrierを張る----
+
 	// 今回のバリアはTransition
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	// Noneにしておく
@@ -381,26 +381,30 @@ void DirectXCommon::PreDraw()
 	// TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 
-	//描画先のRTVを設定する
+	//----描画先を設定、指定した色でクリア（塗りつぶしを）する----
+
+	// 描画先のRTVとDSVを設定する
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap, descriptorSizeDSV, 0);
+
+	// 描画先のRTVを設定する
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-	//指定した色で画面全体をクリアする
-	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+
+	// 指定した色で画面全体をクリアする
+	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色。RGBAの順
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
-	//描画先のRTVとDSVを設定する
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
-	//指定した深度で画面全体をクリアする
+
+	// 指定した深度で画面全体をクリアする
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-	//描画用のDescriptorHeapの設定
-	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get()};
+	// 描画用のDescriptorHeapの設定
+	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
 	commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
-
-	//コマンドを積む
-	commandList->RSSetViewports(1, &viewport);//viewportを設定
-	commandList->RSSetScissorRects(1, &scissorRect);//Scirssorを設定
+	//----コマンドを積む----
+	commandList->RSSetViewports(1, &viewport); // Viewportを設定
+	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
 }
 
 void DirectXCommon::PostDraw()
@@ -409,56 +413,67 @@ void DirectXCommon::PostDraw()
 
 	UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
 
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources[bbIndex].Get();
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	//----画面表示できるようにする----
+
+	// 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+	// 今回はRenderTargetからPresentにする
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-
+	// TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 
-	//コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+	//----CommandListを閉じる----
+
+	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
-	//GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = { commandList.Get()};
+	/**
+
+コマンドをキックする**/
+
+// GPUにコマンドリストの実行を行わせる
+	ID3D12CommandList* commandLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists(1, commandLists);
-	//GPUとOSに画面の交換を行うよう追加する
+	// GPUとOSに画面の交換を行うよう通知する
 	swapChain->Present(1, 0);
+
+	//----GPUにSignalを送る----
 
 	// Fenceの値を更新
 	fenceValue++;
-
-	// GPUがここまでたどり着いたときに、
-	// Fenceの値を指定した値に代入するようにSignalを送る
+	// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
 	commandQueue->Signal(fence.Get(), fenceValue);
 
+	//----待機処理----
+
 	// Fenceの値が指定したSignal値にたどり着いているか確認する
-	// GetCompletdValueの初期化はFence作成時に渡した初期値
-	if (fence->GetCompletedValue() < fenceValue) {
-		// 指定したSignalにたどり着いいていないので、
-		// たどり着くまで待つようにイベントを設定する
+	// GetCompletedValueの初期値はFence作成時に渡した初期値
+	if (fence->GetCompletedValue() < fenceValue)
+	{
+		// 指定したSignalにたどりついていないので、たどり着くまで待つようにイベントを設定する
 		fence->SetEventOnCompletion(fenceValue, fenceEvent);
-		// イベントを待つ
+		// イベント待つ
 		WaitForSingleObject(fenceEvent, INFINITE);
 	}
 
-	//次のフレーム用のコマンドリストを準備
+	// FPS固定
+	//UpdateFixFPS();
+
+	// 次のフレーム用のコマンドリストを準備
 	hr = commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
 	hr = commandList->Reset(commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hr));
-
 }
+
 
 Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
 {
 	//これからシェーダをコンバイルｓる旨をログに出す
 	//Logger::Log(StringUtility::ConvertString(std::format(L" Begin CompileShader,path:{},profile{}\n", filePath, profile)));
 	//hlslファイルを読む
-	IDxcBlobEncoding* shaderSource = nullptr;
+	Microsoft::WRL::ComPtr <IDxcBlobEncoding> shaderSource = nullptr;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	//読めなかったら止める
 	assert(SUCCEEDED(hr));
@@ -478,7 +493,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	};
 
 	//実際にShaderをコンパイルする
-	IDxcResult* shaderResult = nullptr;
+	Microsoft::WRL::ComPtr<IDxcResult> shaderResult = nullptr;
 	hr = dxcCompiler->Compile
 	(
 		&shaderSourceBuffer,//読み込んだファイル
@@ -490,7 +505,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	//コンパイルエラーではなく<dxcが起動できないなど致命的な状況
 	assert(SUCCEEDED(hr));
 	//警告・エラーが出てきたログに出して止める
-	IDxcBlobUtf8* shaderError = nullptr;
+	Microsoft::WRL::ComPtr <IDxcBlobUtf8> shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0)
 	{
@@ -501,14 +516,14 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 
 	//コンパイル結果から実行用のバイナリ部分を所得
 
-	IDxcBlob* shaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	//成功したログを出す
 	//Logger::Log(StringUtility::ConvertString(std::format(L"Compile Succeeded,path:{}, profile:{}\n", filePath, profile)));
 	//もう使わないリソースを解放
-	shaderSource->Release();
-	shaderResult->Release();
+	/*shaderSource->Release();
+	shaderResult->Release();*/
 	//実行用のバイナリを返却
 	return shaderBlob;
 }
@@ -531,7 +546,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_
 	//バッファの場合はこれにする決まり
 	vertexResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	//実際に頂点リソースを作る
-	ID3D12Resource* vertexResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE,
 		&vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
 		IID_PPV_ARGS(&vertexResource));
@@ -544,7 +559,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 {
 	//１.metadataを基にResorceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = UINT(metadata.width);//Textureの幅
+	resourceDesc.Width = UINT(metadata.width);//Teffxtureの幅
 	resourceDesc.Height = UINT(metadata.height);//Textureの高さ
 	resourceDesc.MipLevels = UINT16(metadata.mipLevels);//mipmapの数
 	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);//奥行きor配列Textureの配列数
@@ -557,7 +572,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;//WriteBackポリシーでCPUアクセス可能
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
 	//３.Resourceを生成する
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource>resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,//Heapの設定
 		D3D12_HEAP_FLAG_NONE,//Heapの特殊な設定。特になし
