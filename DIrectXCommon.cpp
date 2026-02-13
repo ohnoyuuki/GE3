@@ -4,7 +4,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-
+#include <thread>
 #include "StringUtility.h"
 using namespace StringUtility;
 
@@ -18,6 +18,9 @@ using namespace Microsoft::WRL;
 
 void DirectXCommon::Initialize(WinApp* winApp)
 {
+	// FPS固定初期化
+	InitializeFixFPS();
+
 	// NULL検出
 	assert(winApp);
 
@@ -428,9 +431,7 @@ void DirectXCommon::PostDraw()
 	hr = commandList->Close();
 	assert(SUCCEEDED(hr));
 
-	/**
-
-コマンドをキックする**/
+	/**コマンドをキックする**/
 
 // GPUにコマンドリストの実行を行わせる
 	ID3D12CommandList* commandLists[] = { commandList.Get() };
@@ -458,7 +459,7 @@ void DirectXCommon::PostDraw()
 	}
 
 	// FPS固定
-	//UpdateFixFPS();
+	UpdateFixFPS();
 
 	// 次のフレーム用のコマンドリストを準備
 	hr = commandAllocator->Reset();
@@ -639,4 +640,35 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(const Microsof
 
 	handle.ptr += descriptorSize * index;
 	return handle;
+}
+
+void DirectXCommon::InitializeFixFPS()
+{
+	//現在時間を記録する
+	reference_ = std::chrono::steady_clock::now();
+}
+
+void DirectXCommon::UpdateFixFPS()
+{
+	//1/60秒ぴったりの時間
+	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
+	//1/60秒よりわずかに短い時間
+	const std::chrono::microseconds kMinCheckTime(uint64_t(1000000.0f / 65.0f));
+
+	//現在時間を取得する
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	//前回記録からの経過時間を所得する
+	std::chrono::microseconds elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - reference_);
+	//1/60秒（よりわかずに短い時間）経ってない場合
+	if (elapsed < kMinCheckTime) {
+		//1/60秒経過するまで微小なスリープを繰り返す
+		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
+			//１マイクロ秒スリープ
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	}
+
+
+	//現在の時間を記録する
+	reference_ = std::chrono::steady_clock::now();
 }

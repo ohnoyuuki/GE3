@@ -7,6 +7,7 @@
 #include <array>
 #include <dxcapi.h>
 #include <string>
+#include <chrono>
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
 
@@ -142,6 +143,14 @@ private:
 
 	// TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
+
+	////FPS固定初期化
+	void InitializeFixFPS();
+	////FPS固定更新
+	void UpdateFixFPS();
+
+	////記録時間（FPS固定用）
+	std::chrono::steady_clock::time_point reference_;
 
 };
 
