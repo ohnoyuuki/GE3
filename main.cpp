@@ -89,11 +89,11 @@ struct ModelData
 
 struct Material
 {
-	Vector4 color;
+	Vector4 color;/*
 	int32_t enableLighting;
 	float padding[3];
 	Matrix4x4 uvTransform;
-	float shininess;
+	float shininess;*/
 };
 
 struct TransformationMatrix
@@ -926,29 +926,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//
 
 
-
-	////頂点リソースを作る
-	//ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
-	////頂点バッファビューを作成する
-	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();//リソースの先頭のアドレスから使う
-	//vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());//使用するリソースのサイズは頂点のサイズ
-	//vertexBufferView.StrideInBytes = sizeof(VertexData);//１頂点あたりのサイズ
-
-	////頂点リソースにデータを書き込む
-	//VertexData* vertexData = nullptr;
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));//書き込むためのアドレスを取得
-	//std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-
-
-
-
-
-
-
-
-
-
 	//マテリアル用のリソースを作る。今回はcolor１つ分のサイズを用意する
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = dxCommon->CreateBufferResource(sizeof(Material));
 	//マテリアルにデータを書き込む
@@ -959,14 +936,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// wvp用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
+	Microsoft::WRL::ComPtr<ID3D12Resource> transfomationMatrixResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
 	// データを書き込む
-	TransformationMatrix* wvpData = nullptr;
+	TransformationMatrix* transfomrationMatrixData = nullptr;
 	// 書き込むためのアドレスを取得
-	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	transfomationMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transfomrationMatrixData));
 	// 単位行列を書き込んでおく
-	wvpData->WVP = MakeIdentity4x4();
-	wvpData->WVP = MakeIdentity4x4();
+	transfomrationMatrixData->WVP = MakeIdentity4x4();
+	transfomrationMatrixData->World = MakeIdentity4x4();
 
 	Transform transform{
 	  {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
@@ -1115,14 +1092,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.0f);
 		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-		wvpData->WVP = worldViewProjectionMatrix;
-		wvpData->World = worldMatrix;
+		transfomrationMatrixData->WVP = worldViewProjectionMatrix;
+		transfomrationMatrixData->World = worldMatrix;
 
 		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 		ImGui::ShowDemoWindow();
 
 		ImGui::Begin("Settings");
-		ImGui::ColorEdit4("material", &materialData->color.x, ImGuiColorEditFlags_AlphaPreview);//RGBWの指定
+		ImGui::ColorEdit4("material", &materialData->color.x);//RGBWの指定
 
 		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.1f);
 		ImGui::DragFloat3("scale", &transform.scale.x, 0.1f);
@@ -1145,6 +1122,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//更新処理をかく
 		// 描画前処理
 		dxCommon->PreDraw();
+
 		//RootSignatureを設定。PSOに設定しているけど別途設定が必要
 		dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 		dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());//PSOを設定
@@ -1153,9 +1131,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		//マテリアルCBufferの場所を設定
-		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, materialResource->GetGPUVirtualAddress());
 		// wvp用のCBufferの場所を設定
-		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, transfomationMatrixResource->GetGPUVirtualAddress());
 
 		//SRVのDescriptorTableの先頭を設定。２はrootParameter[2]である。
 		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
