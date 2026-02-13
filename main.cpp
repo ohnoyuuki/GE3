@@ -19,6 +19,8 @@
 #include <dinput.h>
 #include"DirectXCommon.h"
 #include"StringUtility.h"
+#include"Sprite.h"
+#include"SpriteCommon.h"
 
 
 
@@ -639,6 +641,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// DirectXの初期化
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
+
+	SpriteCommon* spriteCommon = nullptr;
+	spriteCommon = new SpriteCommon;
+	spriteCommon->Initialize();
+
+	Sprite* sprite = new Sprite();
+	sprite->Initialize();
 
 
 	//////COMの初期化
@@ -1278,6 +1287,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//WindowsAPI解放
 	delete winApp;
 	winApp = nullptr;
+
+	delete spriteCommon;
+	delete sprite;
 
 	/*CloseWindow(hwnd);*/
 	/*CoUninitialize();*/
