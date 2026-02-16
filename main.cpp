@@ -860,27 +860,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	//Textueを読んで転送する
-	//DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
-	DirectX::ScratchImage mipImages = dxCommon->LoadTexture(modelData.material.textureFilePath);
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
-	dxCommon->UploadTextureData(textureResource, mipImages);
+	////DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
+	//DirectX::ScratchImage mipImages = dxCommon->LoadTexture(modelData.material.textureFilePath);
+	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	//Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
+	//dxCommon->UploadTextureData(textureResource, mipImages);
 
-	//metaDataを基にSRVの設定
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//２Dテクスチャ
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+	////metaDataを基にSRVの設定
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	//srvDesc.Format = metadata.format;
+	//srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//２Dテクスチャ
+	//srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	//SRVを作成するDescriptorHeapの場所を決める
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon->GetSRVCPUDescriptorHandle(1);
+	/*D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon->GetSRVCPUDescriptorHandle(1);
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = dxCommon->GetSRVGPUDescriptorHandle(1);
-	//先頭はImGuiが使っているのでその次を使う
-	textureSrvHandleCPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	*///先頭はImGuiが使っているのでその次を使う
+	/*textureSrvHandleCPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	textureSrvHandleGPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//SRVの生成
-	dxCommon->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+	*///SRVの生成
+	//dxCommon->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 
 	////DepthStencilTextureをウィンドウのサイズで作成
 	//ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device, WinApp::kClientWidth, WinApp::kClientHeight);
@@ -989,23 +989,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///transfomrationMatrixData->WVP = worldViewProjectionMatrix;
 		//transfomrationMatrixData->World = worldMatrix;
 
-		////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-		//ImGui::ShowDemoWindow();
+		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
+		ImGui::ShowDemoWindow();
 
-		//ImGui::Begin("Settings");
+		ImGui::Begin("Settings");
 		//ImGui::ColorEdit4("material", &materialData->color.x);//RGBWの指定
 
-		//ImGui::DragFloat3("rotate", &transform.rotate.x, 0.1f);
-		//ImGui::DragFloat3("scale", &transform.scale.x, 0.1f);
-		//ImGui::DragFloat3("translate", &transform.translate.x, 0.1f);
+		ImGui::DragFloat3("rotate", &transform.rotate.x, 0.1f);
+		ImGui::DragFloat3("scale", &transform.scale.x, 0.1f);
+		ImGui::DragFloat3("translate", &transform.translate.x, 0.1f);
 
-		//ImGui::Separator();
+		ImGui::Separator();
 
-		////ImGui::DragFloat3("rotateSprite", &transformSprite.rotate.x, 0.1f);
-		///*ImGui::DragFloat3("scaleSprite", &transformSprite.scale.x, 0.1f);
-		//ImGui::DragFloat3("translateSprite", &transformSprite.translate.x, 0.1f);*/
+		//ImGui::DragFloat3("rotateSprite", &transformSprite.rotate.x, 0.1f);
+		/*ImGui::DragFloat3("scaleSprite", &transformSprite.scale.x, 0.1f);
+		ImGui::DragFloat3("translateSprite", &transformSprite.translate.x, 0.1f);*/
 
-		//ImGui::End();
+		ImGui::End();
 
 
 		//transform.rotate.y += 0.03f;

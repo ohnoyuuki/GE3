@@ -116,7 +116,7 @@ void SpriteCommon::CreateGraphicsPipelineState()
 	//RasiterZerStateの設定
 	D3D12_RASTERIZER_DESC rasterizeDesc{};
 	//裏面（時計周り）を表示しない
-	rasterizeDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizeDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//三角形の中を塗りつぶす
 	rasterizeDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	//裏面表示
@@ -158,7 +158,7 @@ void SpriteCommon::CreateGraphicsPipelineState()
 	//Depthの機能を有効化する
 	depthStencilDesc.DepthEnable = false;
 	//書き込みします
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	//比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
