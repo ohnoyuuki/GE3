@@ -191,6 +191,18 @@ public: // メンバ関数
         Matrix4x4 World;
     };
 
+	// getter//
+	const Vector2& GetPosition() const { return position; }
+	float GetRotation() const { return rotation; }
+	const Vector4 GetColor()const { return materialData->color; }
+	const Vector2& GetSize() const { return size; }
+
+	// setter//
+	void SetPosition(const Vector2& position) { this->position = position; }
+	void SetRotation(float rotation) { this->rotation = rotation; }
+	void SetColor(const Vector4& color) { materialData->color = color; }
+	void SetSize(const Vector2& size) { this->size = size; }
+
 
 
 private:
@@ -225,6 +237,15 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource;
 
+
+	// 座標
+	Vector2 position = { 0.0f,0.0f };
+
+	//回転
+	float rotation = 0.0f;
+
+	//サイズ
+	Vector2 size = { 640.0f,360.0f };
 	
 };
 
