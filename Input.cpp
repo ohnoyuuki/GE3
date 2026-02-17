@@ -7,6 +7,11 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
+Input::~Input()
+{
+
+}
+
 void Input::Initialize(WinApp* winApp)
 {
 	//借りてきたWinAppのインスタンスを記録

@@ -9,6 +9,7 @@
 class Input
 {
 public:
+	~Input();
 	// 初期化処理
 	void Initialize(WinApp* winApp);
 

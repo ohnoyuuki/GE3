@@ -87,9 +87,30 @@ void Sprite::Update()
 
 	// 座標
 	transform.translate = { position.x,position.y,0.0f };
-
 	// 回転
 	transform.rotate = { 0.0f,0.0f,rotation };
+	//サイズ
+	// 頂点リソースにデータを書き込む
+// 左下
+	vertexData[0].position = { 0.0f,1.0f,0.0f,1.0f };
+	vertexData[0].texcoord = { 0.0f,1.0f };
+	
+	//左上
+	vertexData[1].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexData[1].texcoord = { 0.0f,0.0f };
+	
+	// 右下
+	vertexData[2].position = { 1.0f,1.0f,0.0f,1.0f };
+	vertexData[2].texcoord = { 1.0f,1.0f };
+	
+	// 右上
+	vertexData[3].position = { 1.0f,0.0f,0.0f,1.0f };
+	vertexData[3].texcoord = { 1.0f,0.0f };
+	
+
+	transform.scale = { size.x ,size.y,1.0f };
+
+
 
 
 

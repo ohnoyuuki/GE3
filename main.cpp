@@ -21,6 +21,7 @@
 #include"StringUtility.h"
 #include"Sprite.h"
 #include"SpriteCommon.h"
+#include"D3DResourceLeakChecker.h"
 
 
 #pragma comment(lib, "dinput8.lib")
@@ -583,20 +584,20 @@ void Log(const std::string& message)
 
 
 
-
-struct D3DResourceLeakChecker {
-	~D3DResourceLeakChecker()
-	{
-		// リソースリークチェック
-		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
-		{
-			debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-			debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-			debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		}
-	}
-};
+//
+//struct D3DResourceLeakChecker {
+//	~D3DResourceLeakChecker()
+//	{
+//		// リソースリークチェック
+//		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+//		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
+//		{
+//			debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+//			debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
+//			debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+//		}
+//	}
+//};
 
 
 //ウィンメイン
@@ -635,6 +636,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	Sprite* sprite = new Sprite();
 	sprite->Initialize(spriteCommon);
+
+	std::vector<Sprite*> sprites;
+	for (uint32_t i = 0; i < 5; ++i) {
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(spriteCommon);
+		// ← ここ追加
+		Sprite::Vector2 pos;
+		pos.x = 100.0f + i * 230.0f;  // 横にずらす
+		pos.y = 100.0f;               // 縦は固定
+		sprite->SetPosition(pos);
+
+		sprite->SetSize({ 156.0f, 156.0f });
+
+		sprites.push_back(sprite);
+	}
+
 
 
 	//////COMの初期化
@@ -974,12 +991,38 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			OutputDebugStringA("Press Space\n");
 		}
 
+		//移動の処理//
+		// 現在の座標を取得
+		Sprite::Vector2 position = sprite->GetPosition();
+		// 座標を変更
+		position.x += 0.1f;
+		position.y += 0.1f;
+		// 反映//
+		sprite->SetPosition(position);
 
-		sprite->Update();
+		//回転の処理//
+		float rotaion = sprite->GetRotation();
+		rotaion += 0.01f;
+		sprite->SetRotation(rotaion);
 
+		//色変化//
+		Sprite::Vector4 color = sprite->GetColor();
+		color.x += 0.01f;
+		if (color.x > 1.0f) {
+			color.x -= 1.0f;
+		}
+		sprite->SetColor(color);
 
+		//サイズ//
+		Sprite::Vector2 size = sprite->GetSize();
+		size.x += 0.1f;
+		size.y += 0.1f;
+		sprite->SetSize(size);
 
-
+		for (Sprite* sprite : sprites) {
+			sprite->Update();
+		}
+		//sprite->Update();
 
 		//Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 		//Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
@@ -1020,7 +1063,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// スプライト描画準備
 		spriteCommon->SetupCommonDrawing();
 		
-		sprite->Draw();
+		for (Sprite* sprite : sprites) {
+			sprite->Draw();
+		}
+		//sprite->Draw();
+
 		//dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
 		//
 		////マテリアルCBufferの場所を設定
@@ -1091,8 +1138,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//
 		//			// 解放
 		//			infoQueue->Release();
-		//
-		//
 		//		}
 		//#endif
 
@@ -1167,6 +1212,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	delete spriteCommon;
 	delete sprite;
+	for (Sprite* sprite : sprites) {
+		delete sprite;
+	}
+
+	sprites.clear();
 
 	/*CloseWindow(hwnd);*/
 	/*CoUninitialize();*/
