@@ -652,8 +652,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		sprites.push_back(sprite);
 	}
 
+	
 	// テクスチャマネージャの初期化
-	TextureManager::GetInstance()->Initialize();
+	TextureManager::GetInstance()->Initialize(dxCommon);
 
 
 
