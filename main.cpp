@@ -22,6 +22,7 @@
 #include"Sprite.h"
 #include"SpriteCommon.h"
 #include"D3DResourceLeakChecker.h"
+#include"TextureManager.h"
 
 
 #pragma comment(lib, "dinput8.lib")
@@ -512,7 +513,6 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 			s >> materialFilename;
 			//基本的にobjファイルと同一階層にmtlは存在させるので、デイレクトリ名とファイル名を渡す
 			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
-
 		}
 
 	}
@@ -605,7 +605,7 @@ void Log(const std::string& message)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	D3DResourceLeakChecker leakCheck;
-	
+
 
 	HRESULT hr;
 	//出力ウィンドウへの文字入力
@@ -651,6 +651,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		sprites.push_back(sprite);
 	}
+
+	// テクスチャマネージャの初期化
+	TextureManager::GetInstance()->Initialize();
 
 
 
@@ -779,13 +782,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		assert(false);
 	}
 
-	
+
 	/*hr = dxCommon->GetDevice()->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignature));
 	assert(SUCCEEDED(hr));*/
 
-	
+
 
 
 	////DirectInputの初期化
@@ -826,7 +829,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData)* modelData.vertices.size());
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
 
 
 
@@ -857,7 +860,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//
 
 
-	
+
 
 	// wvp用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	//Microsoft::WRL::ComPtr<ID3D12Resource> transfomationMatrixResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
@@ -935,7 +938,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//vertexDataSprite[5].position = { 640.0f,360.0f,0.0f,1.0f };//右下
 	//vertexDataSprite[5].texcoord = { 1.0f,1.0f };
 
-	
+
 
 	////CPUで動かす用のTransformを作る
 	//Transform transformSprite{ {1.0f,1.0f,1.0f},{ 0.0f,0.0f,0.0f },{0.0f,0.0f,0.0f} };
@@ -962,7 +965,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	LPDIRECTINPUT8 directInput = nullptr;
 	LPDIRECTINPUTDEVICE8 keyboard = nullptr;
-	
+
 	//------------------------------------------------------------------------------------------------------------------------------
 
 	//メインループ
@@ -1062,7 +1065,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		// スプライト描画準備
 		spriteCommon->SetupCommonDrawing();
-		
+
 		for (Sprite* sprite : sprites) {
 			sprite->Draw();
 		}
@@ -1089,7 +1092,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//--------------------------------------
 
-		
+
 
 
 
@@ -1150,10 +1153,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//
 		//ImGuiの終了処理。詳細はさして重要ではないので解説は省略する。
 		//こういうもんである。初期化と逆順に行う
-		ImGui_ImplDX12_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-	
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
 	//
 	//	indexResourceSprite->Release();
 	//	dsvDescriptorHeap->Release();
@@ -1191,12 +1194,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//#ifdef _DEBUG
 	//	debugController->Release();
 	//#endif
-	
+
 
 
 
 	/*wvpResource->Release();
 	materialResource->Release();*/
+	// テクスチャマネージャの終了
+	TextureManager::GetInstance()->Finalize();
 
 	// 入力解放
 	delete input;

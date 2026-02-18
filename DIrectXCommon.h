@@ -63,9 +63,7 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
 
 	//シェーダ－コンパイル----------------------------------
-	Microsoft::WRL::ComPtr<IDxcBlob>CompileShader(
-		const std::wstring& filePath,
-		const wchar_t* profile);
+	Microsoft::WRL::ComPtr<IDxcBlob>CompileShader(const std::wstring& filePath,const wchar_t* profile);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 
@@ -74,6 +72,10 @@ public:
 	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
 
 	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+	// 最大SRV数（最大テクスチャ枚数）
+	static const uint32_t kMaxSRVCount;
+
 
 private:
 	//DirectX12デバイス
