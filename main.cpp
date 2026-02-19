@@ -630,19 +630,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
 
-	SpriteCommon* spriteCommon = nullptr;
-	spriteCommon = new SpriteCommon;
+	std::vector<std::string>textures = {
+		"resources/uvChecker.png",
+		"resources/monsterball.png"
+	};
+
+	TextureManager::GetInstance()->Initialize(dxCommon);
+
+	for (const std::string& texPath : textures)
+	{
+		TextureManager::GetInstance()->LoadTexture(texPath);
+	}
+
+	//TextureManager::GetInstance()->LoadTexture();
+
+	//SpriteCommon* spriteCommon = nullptr;
+	SpriteCommon* spriteCommon = new SpriteCommon;
 	spriteCommon->Initialize(dxCommon);
 
-	Sprite* sprite = new Sprite();
-	sprite->Initialize(spriteCommon);
+	//Sprite* sprite = new Sprite();
+	//sprite->Initialize(spriteCommon, "resources/uvChecker.png");
 
 	std::vector<Sprite*> sprites;
 	for (uint32_t i = 0; i < 5; ++i) {
 		Sprite* sprite = new Sprite();
-		sprite->Initialize(spriteCommon);
+		std::string& textureFile = textures[i % 2];
+		sprite->Initialize(spriteCommon,textureFile);
 		// ← ここ追加
-		Sprite::Vector2 pos;
+		MyMath::Vector2 pos;
 		pos.x = 100.0f + i * 230.0f;  // 横にずらす
 		pos.y = 100.0f;               // 縦は固定
 		sprite->SetPosition(pos);
@@ -878,7 +893,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Transform cameraTransform{
 		{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -15.0f} };
 
-
+	
 
 	//Textueを読んで転送する
 	////DirectX::ScratchImage mipImages = LoadTexture("resources/uvChecker.png");
@@ -997,35 +1012,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//移動の処理//
 		// 現在の座標を取得
-		Sprite::Vector2 position = sprite->GetPosition();
-		// 座標を変更
-		position.x += 0.1f;
-		position.y += 0.1f;
-		// 反映//
-		sprite->SetPosition(position);
-
-		//回転の処理//
-		float rotaion = sprite->GetRotation();
-		rotaion += 0.01f;
-		sprite->SetRotation(rotaion);
-
-		//色変化//
-		Sprite::Vector4 color = sprite->GetColor();
-		color.x += 0.01f;
-		if (color.x > 1.0f) {
-			color.x -= 1.0f;
-		}
-		sprite->SetColor(color);
-
-		//サイズ//
-		Sprite::Vector2 size = sprite->GetSize();
-		size.x += 0.1f;
-		size.y += 0.1f;
-		sprite->SetSize(size);
-
 		for (Sprite* sprite : sprites) {
-			sprite->Update();
-		}
+            sprite->Update();
+            MyMath::Vector2 position = sprite->GetPosition();
+
+            //position += Vector2{ 0.1f,0.1f };
+
+            sprite->SetPosition(position);
+            //角度を変化させるテスト
+            float rotation = sprite->GetRotation();
+
+            //rotation +=0.01f;
+            sprite->SetRotation(rotation);
+
+            //色を変化させるテスト
+			MyMath::Vector4 color = sprite->GetColor();
+            color.x += 0.01f;
+            if (color.x > 1.0f) {
+                color.x -= 1.0f;
+            }
+            sprite->SetColor(color);
+
+			MyMath::Vector2 size = sprite->GetSize();
+            size.x += 0.1f;
+            size.y += 0.1f;
+            sprite->SetSize(size);
+
+        }
 		//sprite->Update();
 
 		//Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -1217,7 +1230,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	winApp = nullptr;
 
 	delete spriteCommon;
-	delete sprite;
+	//delete sprite;
 	for (Sprite* sprite : sprites) {
 		delete sprite;
 	}

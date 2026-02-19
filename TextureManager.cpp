@@ -11,7 +11,7 @@ uint32_t TextureManager::kSRVIndexTop = 1;
 
 void TextureManager::Initialize(DirectXCommon* dxCommon_)
 {
-	dxCommon_ = dxCommon_;
+	this->dxCommon_ = dxCommon_;
 	//SRVの数と同数
 	textureDatas.reserve(DirectXCommon::kMaxSRVCount);
 }
