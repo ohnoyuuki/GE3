@@ -112,3 +112,12 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 	assert(0);
 	return 0;
 }
+
+D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureIndex)
+{
+	// 範囲外指定違反チェック
+	assert(textureIndex < textureDatas.size());
+
+	TextureData& textureData = textureDatas[textureIndex];
+	return textureData.srvHandleGPU;
+}
