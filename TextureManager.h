@@ -7,7 +7,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 
-
+class DirectXCommon;
 
 class TextureManager
 {
@@ -50,11 +50,7 @@ private:
 	//テクスチャデータ
 	std::vector<TextureData> textureDatas;
 
-	DirectXCommon* dxCommon = nullptr;
-
-	// SRVインデックスの開始番号
-	static uint32_t kSRVIndexTop;
-
+	DirectXCommon* dxCommon_ = nullptr;
 
 	// SRVインデックスの開始番号
 	static uint32_t kSRVIndexTop;

@@ -7,10 +7,11 @@ using namespace StringUtility;
 
 
 TextureManager* TextureManager::instance = nullptr;
+uint32_t TextureManager::kSRVIndexTop = 1;
 
 void TextureManager::Initialize(DirectXCommon* dxCommon_)
 {
-	dxCommon = dxCommon_;
+	dxCommon_ = dxCommon_;
 	//SRVの数と同数
 	textureDatas.reserve(DirectXCommon::kMaxSRVCount);
 }
@@ -67,13 +68,13 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	// テクスチャデータ書き込み
 	textureData.filePath = filePath;
 	textureData.metadata = mipImages.GetMetadata();
-	textureData.resource = dxCommon->CreateTextureResource(textureData.metadata);
+	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
 
 	// テクスチャデータの要素数番号をSRVのインデックスとする
 	uint32_t srvIndex = static_cast<uint32_t>(textureDatas.size() - 1) + kSRVIndexTop;
 
-	textureData.srvHandleCPU = dxCommon->GetSRVCPUDescriptorHandle(srvIndex);
-	textureData.srvHandleGPU = dxCommon->GetSRVGPUDescriptorHandle(srvIndex);
+	textureData.srvHandleCPU = dxCommon_->GetSRVCPUDescriptorHandle(srvIndex);
+	textureData.srvHandleGPU = dxCommon_->GetSRVGPUDescriptorHandle(srvIndex);
 
 	// SRVの生成
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -81,14 +82,12 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
-	dxCommon->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-	// 転送用に生成した中間リソースをテクスチャデータ構造体に格納
-	textureData.intermediateResource = dxCommon->UploadTextureData(textureData.resource, mipImages);
-
+	
 
 	// テクスチャデータ転送
-	dxCommon->UploadTextureData(textureData.resource, mipImages);
+	dxCommon_->UploadTextureData(textureData.resource, mipImages);
 
 	//ミップマップ付きのデータを返す
 	//return mipImages;
