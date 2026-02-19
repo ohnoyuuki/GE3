@@ -2,8 +2,9 @@
 #include"SpriteCommon.h"
 #include "DirectXCommon.h"
 #include "WinApp.h"
+#include"TextureManager.h"
 
-void Sprite::Initialize(SpriteCommon* spriteCommon)
+void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 {
 	// 引数で受け取ってメンバ変数に記録する
 	this->spriteCommon_ = spriteCommon;
@@ -77,9 +78,11 @@ void Sprite::Initialize(SpriteCommon* spriteCommon)
 	//SRVの生成
 	spriteCommon_->GetDxCommon()->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 
-
 	transform = {};
 	transform.scale = { 1.0f,1.0f,1.0f };
+
+	// テクスチャ番号を取得して記録
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 }
 
 void Sprite::Update()
@@ -131,7 +134,7 @@ void Sprite::Draw()
 	//TransformationMatrixCBufferの場所を設定
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, transformationMatrixResource->GetGPUVirtualAddress());
 	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, materialResource->GetGPUVirtualAddress());
-	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	spriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
 	//描画！（DrawInstanced(DrawCall/ドローコル）
 	//spriteCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(6, 1, 0, 0);
 	////描画!(DrawCall/ドローコル）６個のインデックスを使用し１つのインスタンスを描画。その他は当面０で良い
