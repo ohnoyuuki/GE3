@@ -8,8 +8,8 @@
 #include <dxcapi.h>
 #include <string>
 #include <chrono>
-#include "externals/DirectXTex/DirectXTex.h"
-#include "externals/DirectXTex/d3dx12.h"
+#include "../../externals/DirectXTex/DirectXTex.h"
+#include "../../externals/DirectXTex/d3dx12.h"
 
 
 class WinApp;

@@ -1,5 +1,5 @@
 #include "SpriteCommon.h"
-#include "DirectXCommon.h"
+#include "../base/DirectXCommon.h"
 
 
 void SpriteCommon::Initialize(DirectXCommon* dxCommon)

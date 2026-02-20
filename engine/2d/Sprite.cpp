@@ -1,7 +1,7 @@
 #include "Sprite.h"
 #include"SpriteCommon.h"
-#include "DirectXCommon.h"
-#include "WinApp.h"
+#include "../base/DirectXCommon.h"
+#include "../base/WinApp.h"
 #include"TextureManager.h"
 
 

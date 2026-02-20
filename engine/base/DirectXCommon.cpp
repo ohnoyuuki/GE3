@@ -1,9 +1,9 @@
 #include "DirectXCommon.h"
 #include <cassert>
 #include"WinApp.h"
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
+#include "../../externals/imgui/imgui.h"
+#include "../../externals/imgui/imgui_impl_dx12.h"
+#include "../../externals/imgui/imgui_impl_win32.h"
 #include <thread>
 #include "StringUtility.h"
 using namespace StringUtility;

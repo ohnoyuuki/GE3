@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include"externals/DirectXTex/DirectXTex.h"
+#include"../../externals/DirectXTex/DirectXTex.h"
 #include <dxgi1_6.h>  
 #include <algorithm>
 #include <cassert>

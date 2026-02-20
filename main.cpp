@@ -13,8 +13,8 @@
 #include"externals/DirectXTex/DirectXTex.h"
 #include<fstream>
 #include<sstream>
-#include"Input.h"
-#include"WinApp.h"
+#include"engine/io/Input.h"
+#include"engine/base/WinApp.h"
 # define DERECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include"DirectXCommon.h"

@@ -1,6 +1,6 @@
 #include "TextureManager.h"
-#include "DirectXCommon.h"
-#include "StringUtility.h"
+#include "../base/DirectXCommon.h"
+#include "../base/StringUtility.h"
 #include <d3d12.h>
 
 using namespace StringUtility;
