@@ -48,14 +48,22 @@ public: // メンバ関数
 	float GetRotation() const { return rotation; }
 	const MyMath::Vector4 GetColor()const { return materialData->color; }
 	const MyMath::Vector2& GetSize() const { return size; }
+    const MyMath::Vector2& GetAnchorPoint() const { return anchorPoint; }
+    const bool IsFlipX() const { return isFlipX_; }
+    const bool IsFlipY() const { return isFlipY_; }
+    const MyMath::Vector2& GetTextureLeftTop() const { return textureLeftTop; }
+    const MyMath::Vector2& GetTextureSize() const { return textureSize; }
 
 	// setter//
 	void SetPosition(const MyMath::Vector2& position) { this->position = position; }
 	void SetRotation(float rotation) { this->rotation = rotation; }
 	void SetColor(const MyMath::Vector4& color) { materialData->color = color; }
 	void SetSize(const MyMath::Vector2& size) { this->size = size; }
-
-
+    void SetAnchorPoint(const MyMath::Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+    void SetFlipX(bool isFlipX) { this->isFlipX_ = isFlipX; }
+    void SetFlipY(bool isFlipY) { this->isFlipY_ = isFlipY; }
+    void SetTextureLeftTop(const MyMath::Vector2& textureLeftTop) { this->textureLeftTop = textureLeftTop; }
+    void SetTextureSize(const MyMath::Vector2& textureSize) { this->textureSize = textureSize; }
 
 private:
 
@@ -101,6 +109,21 @@ private:
 
 	// テクスチャ番号
 	uint32_t textureIndex = 0;
-	
+
+    // アンカーポイント
+    MyMath::Vector2 anchorPoint = { 0.5f,0.5f };
+
+    // フリップ
+    //左右
+    bool isFlipX_ = false;
+    //上下
+    bool isFlipY_ = false;
+
+    // テクスチャ範囲指定
+    MyMath::Vector2 textureLeftTop = { 0.0f,0.0f };		// テクスチャ左上座標
+    MyMath::Vector2 textureSize = { 64.0f,64.0f };	// テクスチャ切り出しサイズ
+
+    // テクスチャサイズ調整
+    void AdjustTextureSize();
 };
 

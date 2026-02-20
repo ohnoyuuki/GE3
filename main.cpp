@@ -664,12 +664,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		sprite->SetSize({ 156.0f, 156.0f });
 
+		//sprite->SetFlipY(true);
+
 		sprites.push_back(sprite);
 	}
 
 	
 	// テクスチャマネージャの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon);
+	//TextureManager::GetInstance()->Initialize(dxCommon);
 
 
 
@@ -1034,8 +1036,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
             sprite->SetColor(color);
 
 			MyMath::Vector2 size = sprite->GetSize();
-            size.x += 0.1f;
-            size.y += 0.1f;
+            //size.x += 0.1f;
+            //size.y += 0.1f;
             sprite->SetSize(size);
 
         }

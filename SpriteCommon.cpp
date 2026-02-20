@@ -119,10 +119,9 @@ void SpriteCommon::CreateGraphicsPipelineState()
 	rasterizeDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//三角形の中を塗りつぶす
 	rasterizeDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	//裏面表示
-	//rasterizeDesc.CullMode = D3D12_CULL_MODE_NONE;
-
-
+	
+	// カリングしない（裏面も表示させる）
+	rasterizeDesc.CullMode = D3D12_CULL_MODE_NONE;
 
 	//shaderをコンバイルする
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = dxCommon_->CompileShader(L"Object3d.VS.hlsl",
