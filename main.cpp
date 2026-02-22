@@ -28,7 +28,6 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 
@@ -522,26 +521,26 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 }
 
 
-
-//ウィンドウプロシージャ
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-	{
-		return true;
-	}
-	//メッセージに応じてゲーム固有の処理を行う
-	switch (msg)
-	{
-		//ウィンドウが破棄された
-	case WM_DESTROY:
-		//osに応じて、アプリの終了を伝える
-		PostQuitMessage(0);
-		return 0;
-	}
-	//標準のメッセージ処理を行う
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
+//
+////ウィンドウプロシージャ
+//LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+//{
+//	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+//	{
+//		return true;
+//	}
+//	//メッセージに応じてゲーム固有の処理を行う
+//	switch (msg)
+//	{
+//		//ウィンドウが破棄された
+//	case WM_DESTROY:
+//		//osに応じて、アプリの終了を伝える
+//		PostQuitMessage(0);
+//		return 0;
+//	}
+//	//標準のメッセージ処理を行う
+//	return DefWindowProc(hwnd, msg, wparam, lparam);
+//}
 
 void Log(const std::string& message)
 {
