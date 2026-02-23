@@ -4,7 +4,7 @@
 #include <wrl.h>
 #include <cmath>
 #include <string>
-#include"../math/MyMath.h"
+#include"MyMath.h"
 
 class SpriteCommon;
 

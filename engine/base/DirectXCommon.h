@@ -13,9 +13,6 @@
 
 
 class WinApp;
-
-
-
 class DirectXCommon
 {
 public:

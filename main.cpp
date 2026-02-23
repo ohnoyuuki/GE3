@@ -10,12 +10,12 @@
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
-#include"externals/DirectXTex/DirectXTex.h"
+//#include"externals/DirectXTex/DirectXTex.h"
 #include<fstream>
 #include<sstream>
-#include"engine/io/Input.h"
-#include"engine/base/WinApp.h"
-# define DERECTINPUT_VERSION 0x0800
+#include"Input.h"
+#include"WinApp.h"
+//# define DERECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include"DirectXCommon.h"
 #include"StringUtility.h"
@@ -24,17 +24,13 @@
 #include"D3DResourceLeakChecker.h"
 #include"TextureManager.h"
 
-
-#pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
-
-
-
-
-#pragma comment(lib, "dxguid.lib")
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
 #pragma comment(lib,"dxcompiler.lib")
+
+//#pragma comment(lib, "dinput8.lib")
+//#pragma comment(lib, "dxguid.lib")
+//#pragma comment(lib, "d3d12.lib")
+//#pragma comment(lib, "dxgi.lib")
 
 using namespace StringUtility;
 

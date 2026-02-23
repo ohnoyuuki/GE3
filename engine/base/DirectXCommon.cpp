@@ -519,13 +519,14 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;//UTF8の文字コードであることを通知
+	//Compileする
 	LPCWSTR arguments[] =
 	{
 	filePath.c_str(),//コンパイル対象のhlslファイル名
 	L"-E",L"main",//エントリーポイントの指定。基本的にmain以外にはしない
 	L"-T",profile,//shaderProfileの設定
 	L"-Zi",L"-Qembed_debug",//デバッグ用の情報を埋め込む
-	L"Od",//最適化を外しておく
+	L"-Od",//最適化を外しておく
 	L"-Zpr",//メモリレイアウトは行優先
 	};
 

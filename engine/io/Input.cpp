@@ -1,4 +1,5 @@
 #include "Input.h"
+#include"WinApp.h"
 #include <cassert>
 #include <wrl.h>
 
