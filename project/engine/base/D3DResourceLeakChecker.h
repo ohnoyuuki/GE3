@@ -5,3 +5,4 @@ public:
 	~D3DResourceLeakChecker();
 };
 
+
