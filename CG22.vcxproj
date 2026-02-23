@@ -190,9 +190,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="engine\io\Input.h" />
-    <ClInclude Include="MyMath.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="SpriteCommon.h" />
     <ClInclude Include="engine\base\StringUtility.h" />
     <ClInclude Include="engine\2d\TextureManager.h" />
     <ClInclude Include="engine\base\WinApp.h" />
